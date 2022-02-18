@@ -13,6 +13,7 @@ import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import { Data } from './interfaces/data.interface';
 import { map } from 'rxjs/operators';
+import { ApiOperation, ApiParam, ApiPropertyOptional, ApiResponse } from '@nestjs/swagger';
 
 const ORG = 'org';
 const OBJECT = 'object';
@@ -25,7 +26,12 @@ export class AppController {
     private config: ConfigService,
   ) {}
 
+  @ApiOperation({
+    summary: 'Get connector identification',
+    description: 'Retrieve information about the connector',
+  })
   @Get()
+  @ApiResponse({ status: 200, description: 'Return JSON array of information' })
   getIdentity(): Identity {
     return {
       name: this.config.get<string>('name'),
@@ -51,6 +57,30 @@ export class AppController {
   }
 
   @Get('info')
+  @ApiOperation({
+    summary: 'Get information iframe url',
+    description:
+      'Retrieve a url that can be used to present information about the connector',
+  })
+  @ApiParam({
+    name: 'org',
+    type: 'string',
+    description: 'The associated organization id',
+    allowEmptyValue: true,
+  })
+  @ApiParam({
+    name: 'object',
+    type: 'string',
+    description: 'The type of object to retrieve information for',
+    allowEmptyValue: true,
+  })
+  @ApiParam({
+    name: 'object_id',
+    type: 'string',
+    description: 'The object id to retrieve information for',
+    allowEmptyValue: true,
+  })
+  @ApiResponse({ status: 200, description: 'Return JSON array containing a url' })
   getInfo(@Req() request: Request): Data {
     let orginalUrl = request.originalUrl;
     orginalUrl = orginalUrl.replace('/info', '/transactions');
@@ -61,6 +91,30 @@ export class AppController {
   }
 
   @Get('config')
+  @ApiOperation({
+    summary: 'Get configuration iframe url',
+    description:
+      'Retrieve a url that can be used to present configuration options for the connector',
+  })
+  @ApiParam({
+    name: 'org',
+    type: 'string',
+    description: 'The associated organization id',
+    allowEmptyValue: true,
+  })
+  @ApiParam({
+    name: 'object',
+    type: 'string',
+    description: 'The type of object to retrieve information for',
+    allowEmptyValue: true,
+  })
+  @ApiParam({
+    name: 'object_id',
+    type: 'string',
+    description: 'The object id to retrieve information for',
+    allowEmptyValue: true,
+  })
+  @ApiResponse({ status: 200, description: 'Return JSON array containing a url' })
   getConfig() {
     return {};
     // return {
