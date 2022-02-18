@@ -10,9 +10,26 @@ export class RegistrationService implements OnApplicationBootstrap {
   constructor(private http: HttpService, private config: ConfigService) {}
 
   onApplicationBootstrap(): any {
+    if (this.config.get<string>('k_service') ) {
+      this.getCloudRunUrl().subscribe((data) => {
+        console.log(data);
+      });
+    }
     this.register().subscribe((data) => {
       console.log(data);
     });
+  }
+
+  getCloudRunUrl() {
+    const usEast4 = 'us-east4-run.googleapis.com';
+    const google = 'run.googleapis.com';
+    const endpoint = google;
+    const requestUrl =
+      'https://' +
+      endpoint +
+      '/apis/serving.knative.dev/v1/' +
+      this.config.get<string>('k_service');
+    return this.http.get(requestUrl).pipe(map((response) => response.data));
   }
 
   register() {
