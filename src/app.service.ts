@@ -1,9 +1,39 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { Customer } from './interfaces/customer.interface';
+import { UrlDiscoveryService } from './services/url-discovery/url-discovery.service';
+import { RegistrationService } from './services/registration/registration.service';
 
 @Injectable()
-export class AppService {
+export class AppService implements OnApplicationBootstrap {
+
+  private baseUrl: string;
   private customer: Customer;
+
+  constructor(
+    private readonly urlDiscoveryService: UrlDiscoveryService,
+    private readonly registrationService: RegistrationService,
+  ) {}
+
+  setBaseUrl(url: string) {
+    this.baseUrl = url;
+  }
+
+  getBaseUrl() {
+    return this.baseUrl;
+  }
+
+  async onApplicationBootstrap(): Promise<any> {
+    try {
+      this.setBaseUrl(
+        await this.urlDiscoveryService.getConnectorUrl(),
+      );
+      this.registrationService.setUrlToRegister(this.baseUrl);
+      const response = await this.registrationService.register();
+      console.log('### registration response:', response);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   setCustomer(customer: Customer): void {
     this.customer = customer;
@@ -25,7 +55,7 @@ export class AppService {
     } else {
       html += '<h2>Last Three Transactions for:</h2>';
     }
-    html += '<table width="100%">';
+    html += '<table style="width:100%>';
     html += '<tr><th>Date</th><th>Description</th><th>Amount</th></tr>';
     html += '<tr><th>' + Date().toLocaleLowerCase('en-US') + '</th><th>Nespresso</th><th>$25.88</th></tr>';
     html += '<tr><th>' + Date().toLocaleLowerCase('en-US') + '</th><th>Ralphs</th><th>$101.22</th></tr>';
@@ -35,8 +65,9 @@ export class AppService {
   }
 
   getForm(): string {
+    const target = this.baseUrl + '/form';
     let html = '<h2>Sample Form</h2>';
-    html += '<form>';
+    html += `<form method="POST" action="${target}">`;
     html += '<label for="name">Name:</label>';
     html += '<input type="text" id="name" name="name" value="John Smith">';
     html += '<br>';

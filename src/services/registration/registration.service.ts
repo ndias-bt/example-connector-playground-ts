@@ -1,44 +1,27 @@
-import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
-import { map } from 'rxjs/operators';
-import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
+import { Injectable } from '@nestjs/common';
 import { Endpoint } from '../../interfaces/endpoint.interface';
 import { Connector } from '../../interfaces/connector.interface';
+import { ConfigService } from '@nestjs/config';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
-export class RegistrationService implements OnApplicationBootstrap {
-  constructor(private http: HttpService, private config: ConfigService) {}
+export class RegistrationService {
+  private urlToRegister: string;
 
-  onApplicationBootstrap(): any {
-    if (this.config.get<string>('k_service') ) {
-      this.getCloudRunUrl().subscribe((data) => {
-        console.log(data);
-      });
-    }
-    this.register().subscribe((data) => {
-      console.log(data);
-    });
+  constructor(
+    private readonly http: HttpService,
+    private readonly config: ConfigService,
+  ) {}
+
+  getUrlToRegister() {
+    return this.urlToRegister;
   }
 
-  getCloudRunUrl() {
-    const usEast4 = 'us-east4-run.googleapis.com';
-    const google = 'run.googleapis.com';
-    const endpoint = google;
-    const requestUrl =
-      'https://' +
-      endpoint +
-      '/apis/serving.knative.dev/v1/' +
-      this.config.get<string>('k_service');
-    return this.http.get(requestUrl).pipe(map((response) => response.data));
+  setUrlToRegister(url: string) {
+    this.urlToRegister = url;
   }
 
-  register() {
-    const baseUrl =
-      'http://' +
-      this.config.get<string>('ipAddress') +
-      ':' +
-      this.config.get<string>('port');
-
+  async register(): Promise<any> {
     const configEndpoint: Endpoint = {
       name: 'config',
       address: this.config.get<string>('ipAddress'),
@@ -54,14 +37,20 @@ export class RegistrationService implements OnApplicationBootstrap {
     };
 
     const connector: Connector = {
-      base_url: baseUrl,
-      description: this.config.get<string>('displayName'),
+      name: this.config.get<string>('name'),
+      base_url: this.urlToRegister,
+      displayName: this.config.get<string>('displayName'),
+      description: this.config.get<string>('description'),
+      company: this.config.get<string>('company'),
       endpoints: [infoEndpoint, configEndpoint],
-      name: this.config.get<string>('name') + '-' + Date.now(),
-      version: '1.0',
+      version: this.config.get<string>('version'),
     };
-    return this.http
-      .post(this.config.get<string>('registrationUrl'), connector)
-      .pipe(map((response) => response.data));
+
+    return this.http.post(
+      this.config.get<string>('registrationUrl'),
+      connector,
+    ).toPromise();
+
+    // .pipe(map((response) => response.data));
   }
 }
