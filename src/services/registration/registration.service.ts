@@ -35,12 +35,13 @@ export class RegistrationService implements OnApplicationBootstrap {
   getCloudRunUrl() {
     const usEast4 = 'us-east4-run.googleapis.com';
     const google = 'run.googleapis.com';
-    const endpoint = google;
+    const endpoint = usEast4;
     const requestUrl =
       'https://' +
       endpoint +
       '/apis/serving.knative.dev/v1/' +
       this.config.get<string>('k_service');
+    console.log('GCR Request URL: ' + requestUrl);
     // return this.http.get(requestUrl).pipe(map((response) => response.data));
     return this.http
       .get(requestUrl)
@@ -81,6 +82,9 @@ export class RegistrationService implements OnApplicationBootstrap {
     // return this.http
     //   .post(this.config.get<string>('registrationUrl'), connector)
     //   .pipe(map((response) => response.data));
+    console.log(
+      'Registering Connector: ' + this.config.get<string>('registrationUrl'),
+    );
     return this.http
       .post(this.config.get<string>('registrationUrl'), connector)
       .toPromise()
