@@ -4,7 +4,6 @@ import { Connector } from '../../interfaces/connector.interface';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 
-
 @Injectable()
 export class RegistrationService {
   private urlToRegister: string;
@@ -50,8 +49,6 @@ export class RegistrationService {
     return this.http.post(
       this.config.get<string>('registrationUrl'),
       connector,
-    ).toPromise();
-
-    // .pipe(map((response) => response.data));
-
+    );
+  }
 }

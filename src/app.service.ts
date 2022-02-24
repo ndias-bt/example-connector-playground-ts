@@ -29,7 +29,6 @@ export class AppService implements OnApplicationBootstrap {
       );
       this.registrationService.setUrlToRegister(this.baseUrl);
       const response = await this.registrationService.register();
-      console.log('### registration response:', response);
     } catch (error) {
       console.log(error);
     }
