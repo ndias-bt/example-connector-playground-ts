@@ -12,7 +12,8 @@ export class RegistrationService {
   constructor(
     private readonly http: HttpService,
     private readonly config: ConfigService,
-  ) {}
+  ) {
+  }
 
   getUrlToRegister() {
     return this.urlToRegister;
@@ -50,8 +51,6 @@ export class RegistrationService {
     return this.http.post(
       this.config.get<string>('registrationUrl'),
       connector,
-    ).toPromise();
-
-    // .pipe(map((response) => response.data));
-
+    );
+  }
 }
