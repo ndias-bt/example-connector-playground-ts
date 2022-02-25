@@ -1,5 +1,5 @@
 import {
-  Injectable,
+  Injectable, Logger
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { google } from 'googleapis';
@@ -7,11 +7,17 @@ import { google } from 'googleapis';
 @Injectable()
 export class UrlDiscoveryService {
 
+  private readonly logger = new Logger(UrlDiscoveryService.name);
+
   constructor(private config: ConfigService) {}
 
   async getConnectorUrl() {
     const defaultUrl = this.config.get('url');
     const connectorName = this.config.get('name');
+
+    this.logger.log(
+      `Connector '${connectorName}' url initially set to default '${defaultUrl}'`,
+    );
 
     if (process.env.K_SERVICE) {
       // deployed on cloud run
@@ -22,10 +28,7 @@ export class UrlDiscoveryService {
   }
 
   async getCloudRunConnectorUrl(connectorName: string): Promise<string> {
-    console.log(
-      '### looking up connector url for connectorName',
-      connectorName,
-    );
+    this.logger.log('Requesting cloud run url for connector ' + connectorName);
 
     // TODO: put this default in a config file, with way to override
     const connectorFarmProjectId = 'connector-registry-poc';
@@ -60,20 +63,16 @@ export class UrlDiscoveryService {
     const connectorUrls = [];
 
     results.data.items.forEach((item) => {
-      console.log('### found connector:', item.metadata.name);
-
       if (item.metadata.name === connectorName) {
         connectorUrls.push(item.status.url);
       }
     });
 
-    console.log('### connectorUrls', connectorUrls);
-
     if (connectorUrls.length === 1) {
-      console.log('### returning', connectorUrls[0]);
+      this.logger.log('Returning connector url', connectorUrls[0]);
       return connectorUrls[0];
     } else {
-      console.log('### errors', connectorUrls);
+      this.logger.log('Errors:', connectorUrls);
       return null;
     }
   }

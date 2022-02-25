@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Endpoint } from '../../interfaces/endpoint.interface';
 import { Connector } from '../../interfaces/connector.interface';
 import { ConfigService } from '@nestjs/config';
@@ -7,6 +7,9 @@ import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class RegistrationService {
+
+  private readonly logger = new Logger(RegistrationService.name);
+
   private urlToRegister: string;
 
   constructor(
@@ -24,6 +27,10 @@ export class RegistrationService {
   }
 
   async register(): Promise<any> {
+
+    const registrationUrl = this.config.get<string>('registrationUrl');
+    const connectorUrl = this.urlToRegister;
+
     const configEndpoint: Endpoint = {
       name: 'config',
       address: this.config.get<string>('ipAddress'),
@@ -48,9 +55,8 @@ export class RegistrationService {
       version: this.config.get<string>('version'),
     };
 
-    return this.http.post(
-      this.config.get<string>('registrationUrl'),
-      connector,
-    );
+    this.logger.log(`Registering connector at [${connectorUrl}] with registry [${registrationUrl}]`);
+
+    return this.http.post(registrationUrl, connector);
   }
 }
