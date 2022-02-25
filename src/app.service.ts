@@ -48,6 +48,14 @@ export class AppService implements OnApplicationBootstrap {
     object: string | string[] | undefined,
     object_id: string | string[] | undefined,
   ): string {
+
+    dummyTransactions = {
+      'Nespresso': [25.88, ],
+      'Ralphs': [101.22],
+      'Best Buy': [722.22, ]
+    }
+
+
     // let html = '<h2>Last Three Transactions for ' + this.customer.id + ':</h2>';
     let html = '';
     if (object != undefined && object_id != undefined) {
@@ -60,7 +68,7 @@ export class AppService implements OnApplicationBootstrap {
     } else {
       html += '<h2>Last Three Transactions for:</h2>';
     }
-    html += '<table style="width:100%>';
+    html += '<table style="width:100%">';
     html += '<tr><th>Date</th><th>Description</th><th>Amount</th></tr>';
     html +=
       '<tr><th>' +
