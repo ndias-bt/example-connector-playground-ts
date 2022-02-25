@@ -3,6 +3,10 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
+
+  // disable log colorization if running on google cloud run
+  if (process.env.K_SERVICE) { process.env.NO_COLOR = 'true' }
+
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
