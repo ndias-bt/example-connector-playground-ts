@@ -49,12 +49,6 @@ export class AppService implements OnApplicationBootstrap {
     object_id: string | string[] | undefined,
   ): string {
 
-    dummyTransactions = {
-      'Nespresso': [25.88, ],
-      'Ralphs': [101.22],
-      'Best Buy': [722.22, ]
-    }
-
 
     // let html = '<h2>Last Three Transactions for ' + this.customer.id + ':</h2>';
     let html = '';
