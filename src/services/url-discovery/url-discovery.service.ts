@@ -12,19 +12,24 @@ export class UrlDiscoveryService {
   constructor(private config: ConfigService) {}
 
   async getConnectorUrl() {
-    const defaultUrl = this.config.get('url');
+
+    const defaultConnectorUrl = this.config.get('url');
     const connectorName = this.config.get('name');
 
-    this.logger.log(
-      `Connector '${connectorName}' url initially set to default '${defaultUrl}'`,
-    );
+    let cloudRunConnectorUrl = null;
 
-    if (process.env.K_SERVICE) {
-      // deployed on cloud run
-      return await this.getCloudRunConnectorUrl(connectorName);
+    if (process.env.K_SERVICE) { // deployed on cloud run
+      cloudRunConnectorUrl = await this.getCloudRunConnectorUrl(connectorName);
     }
 
-    return this.config.get('url');
+    if (cloudRunConnectorUrl !== null) {
+      this.logger.log('Using cloud run connector url: ' + cloudRunConnectorUrl);
+      return cloudRunConnectorUrl;
+    } else {
+      this.logger.log('Using default connector url: ' + defaultConnectorUrl);
+      return defaultConnectorUrl;
+    }
+
   }
 
   async getCloudRunConnectorUrl(connectorName: string): Promise<string> {
@@ -69,7 +74,9 @@ export class UrlDiscoveryService {
     });
 
     if (connectorUrls.length === 1) {
-      this.logger.log('Returning connector url', connectorUrls[0]);
+      this.logger.log(
+        'Discovered cloud run connector url: ' + connectorUrls[0],
+      );
       return connectorUrls[0];
     } else {
       this.logger.log('Errors:', connectorUrls);
