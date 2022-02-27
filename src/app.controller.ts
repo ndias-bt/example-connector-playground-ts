@@ -35,11 +35,15 @@ export class AppController {
   getIdentity(): Identity {
     return {
       name: this.config.get<string>('name'),
-      displayName: this.config.get<string>('displayName'),
+      provider: this.config.get('provider'),
       version: this.config.get<string>('version'),
-      company: this.config.get<string>('company'),
-      icon: this.config.get<string>('url') + '/icon',
       url: this.config.get<string>('url'),
+
+      displayName: this.config.get('displayName'),
+      company: this.config.get<string>('company'),
+      description: this.config.get('description'),
+
+      icon: this.config.get<string>('url') + '/icon',
       hasConfig: true,
       hasInfo: true,
     };

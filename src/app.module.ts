@@ -21,15 +21,17 @@ import * as Joi from 'joi';
       load: [configuration],
       validationSchema: Joi.object({
         NAME: Joi.string().required(),
-        DISPLAY_NAME: Joi.string().default(''),
-        DESCRIPTION: Joi.string().default(''),
-        COMPANY: Joi.string().default(''),
+        PROVIDER: Joi.string().required(),
         VERSION: Joi.string().default('0.0.1'),
-        BASE_URL: Joi.string().default('http://localhost'),
-        IP_ADDRESS: Joi.string().default('127.0.0.1'),
-        PORT: Joi.number().default(3000),
+
+        URL: Joi.string().default('http://localhost'),
+
+        DISPLAY_NAME: Joi.string().default(''),
+        COMPANY: Joi.string().default(''),
+        DESCRIPTION: Joi.string().default(''),
+
         REGISTRATION_URL: Joi.string().default(
-          'https://connector-registry-xzww6y6oeq-uc.a.run.app/v1/connector',
+          'https://service-connector-registry-dev-hardening-xzww6y6oeq-uc.a.run.app/v1/connectors',
         ),
       }),
     }),

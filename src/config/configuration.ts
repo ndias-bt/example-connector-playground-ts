@@ -4,14 +4,16 @@ import * as os from 'os';
 
 export const configuration = () => ({
   name: process.env.NAME,
-  displayName: process.env.DISPLAY_NAME,
-  description: process.env.DESCRIPTION,
-  company: process.env.COMPANY,
+  provider: process.env.PROVIDER,
   version: process.env.VERSION,
-  ipAddress: process.env.IP_ADDRESS,
+
+  url: process.env.URL,
+
+  displayName: process.env.DISPLAY_NAME,
+  company: process.env.COMPANY,
+  description: process.env.DESCRIPTION,
+
   hostname: os.hostname(),
-  port: process.env.PORT,
-  url: process.env.BASE_URL,
   registrationUrl: process.env.REGISTRATION_URL,
   k_service: process.env.K_SERVICE,
 });
