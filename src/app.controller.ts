@@ -131,7 +131,7 @@ export class AppController {
     // };
   }
 
-  @Get('lorem-picsum')
+  @Get('lorempicsum')
   getLoremPicsum(@Res() response: Response) {
 
     const url = 'https://picsum.photos/200';
