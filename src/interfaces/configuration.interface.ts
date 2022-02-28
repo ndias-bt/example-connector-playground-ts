@@ -1,12 +1,15 @@
 export class Configuration {
   name: string;
-  displayName: string;
-  description: string;
-  company: string;
+  provider: string;
   version: string;
-  ipAddress: string;
-  hostname: string;
-  port: string;
+
   url: string;
+
+  displayName: string;
+  company: string;
+  description: string;
+
+  hostname: string;
   registrationUrl: string;
+  k_service: string;
 }

@@ -1,10 +1,14 @@
 export interface Identity {
-    name: string;
-    displayName: string;
-    version: string;
-    company: string;
-    icon: string;
-    url: string;
-    hasConfig: boolean;
-    hasInfo: boolean;
+  name: string;
+  provider: string;
+  version: string;
+  url: string;
+
+  displayName: string;
+  company: string;
+  description: string;
+
+  icon: string;
+  hasConfig: boolean;
+  hasInfo: boolean;
 }

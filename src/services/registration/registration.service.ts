@@ -1,13 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Endpoint } from '../../interfaces/endpoint.interface';
 import { Connector } from '../../interfaces/connector.interface';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 
-
 @Injectable()
 export class RegistrationService {
-
   private readonly logger = new Logger(RegistrationService.name);
 
   private urlToRegister: string;
@@ -15,8 +12,7 @@ export class RegistrationService {
   constructor(
     private readonly http: HttpService,
     private readonly config: ConfigService,
-  ) {
-  }
+  ) {}
 
   getUrlToRegister() {
     return this.urlToRegister;
@@ -28,34 +24,24 @@ export class RegistrationService {
 
   async register(): Promise<any> {
 
-    const registrationUrl = this.config.get<string>('registrationUrl');
-    const connectorUrl = this.urlToRegister;
-
-    const configEndpoint: Endpoint = {
-      name: 'config',
-      address: this.config.get<string>('ipAddress'),
-      port: this.config.get<string>('port'),
-      path: '/config',
-    };
-
-    const infoEndpoint: Endpoint = {
-      name: 'info',
-      address: this.config.get<string>('ipAddress'),
-      port: this.config.get<string>('port'),
-      path: '/info',
-    };
+    const registrationUrl = this.config.get('registrationUrl');  // i.e. the registry location
 
     const connector: Connector = {
       name: this.config.get<string>('name'),
-      base_url: this.urlToRegister,
-      displayName: this.config.get<string>('displayName'),
-      description: this.config.get<string>('description'),
-      company: this.config.get<string>('company'),
-      endpoints: [infoEndpoint, configEndpoint],
+      provider: this.config.get<string>('provider'),
       version: this.config.get<string>('version'),
+      url: this.urlToRegister,
+      displayName: this.config.get<string>('displayName'),
+      company: this.config.get<string>('company'),
+      description: this.config.get<string>('description'),
     };
 
-    this.logger.log(`Registering connector at [${connectorUrl}] with registry [${registrationUrl}]`);
+    this.logger.log(
+      `Registering connector at [${this.urlToRegister}] with registry [${registrationUrl}]`,
+    );
+
+    this.logger.log(connector);
+    this.logger.log(registrationUrl);
 
     return this.http.post(registrationUrl, connector);
   }
