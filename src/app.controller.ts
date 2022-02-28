@@ -87,7 +87,7 @@ export class AppController {
   @ApiResponse({ status: 200, description: 'Return JSON array containing a url' })
   getInfo(@Req() request: Request): Data {
     let orginalUrl = request.originalUrl;
-    orginalUrl = orginalUrl.replace('/info', '/transactions');
+    orginalUrl = orginalUrl.replace('/info', '/lorempicsum');
     const url = request.protocol + '://' + request.get('host') + orginalUrl;
     return {
       url: url,
@@ -131,12 +131,15 @@ export class AppController {
     // };
   }
 
-  @Get('transactions')
-  getTransactions(@Req() request: Request, @Res() response: Response) {
-    const object = request.query[OBJECT] as string;
-    const object_id = request.query[OBJECT_ID] as string;
+  @Get('lorem-picsum')
+  getLoremPicsum(@Res() response: Response) {
+
+    const url = 'https://picsum.photos/200';
+
+    const html = `<img src='${url}' height="200" width="200">`;
     response.set('Content-Type', 'text/html');
-    response.send(this.appService.getTransactions(object, object_id));
+    response.send(html);
+
   }
 
   @Get('form')
