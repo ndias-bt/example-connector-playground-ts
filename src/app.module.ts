@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import WeatherController from './weather.controller';
+import { WeatherService } from './services/weather/weather.service';
 // import { ServeStaticModule } from '@nestjs/serve-static';
 // import { join } from 'path';
 import { ConfigModule } from '@nestjs/config';
@@ -9,6 +11,7 @@ import { UrlDiscoveryService } from './services/url-discovery/url-discovery.serv
 import { RegistrationService } from './services/registration/registration.service';
 import { configuration } from './config/configuration'; // this is new
 import * as Joi from 'joi';
+
 
 @Module({
   imports: [
@@ -42,7 +45,7 @@ import * as Joi from 'joi';
       maxRedirects: 5,
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService, UrlDiscoveryService, RegistrationService],
+  controllers: [AppController, WeatherController],
+  providers: [AppService, WeatherService, UrlDiscoveryService, RegistrationService],
 })
 export class AppModule {}

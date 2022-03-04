@@ -87,12 +87,16 @@ export class AppController {
   })
   @ApiResponse({ status: 200, description: 'Return JSON array containing a url' })
   getInfo(@Req() request: Request): Data {
-    let orginalUrl = request.originalUrl;
-    orginalUrl = orginalUrl.replace('/info', '/weather');
-    const url = request.protocol + '://' + request.get('host') + orginalUrl;
     return {
-      url: url,
+      url: this.config.get('url') + '/weather',
     };
+
+    // let originalUrl = request.originalUrl;
+    // originalUrl = originalUrl.replace('/info', '/weather');
+    // const url = request.protocol + '://' + request.get('host') + originalUrl;
+    // return {
+    //   url: url,
+    // };
   }
 
   @Get('config')
@@ -130,24 +134,6 @@ export class AppController {
     //       this.configService.get<string>('port') +
     //       '/form',
     // };
-  }
-
-  @Get('weather')
-  @Render('index')
-  async getWeather(@Req() request: Request, @Res() response: Response) {
-    const zip = request.query[ZIP] as string;
-
-    const result = await this.appService.getWeather(zip);
-
-    return result;
-  }
-
-  @Get('weather/zip/:zip')
-  @Render('index')
-  async getWeatherByZip(@Param('zip') zip: string) {
-
-    return await this.appService.getWeather(zip);
-
   }
 
   @Get('form')
