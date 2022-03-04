@@ -12,4 +12,6 @@ export class Configuration {
   hostname: string;
   registrationUrl: string;
   k_service: string;
+
+  openWeatherApiKey: string;
 }

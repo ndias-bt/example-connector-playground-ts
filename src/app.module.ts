@@ -33,6 +33,8 @@ import * as Joi from 'joi';
         REGISTRATION_URL: Joi.string().default(
           'https://service-connector-registry-xzww6y6oeq-uc.a.run.app',
         ),
+
+        OPENWEATHER_API_KEY: Joi.string(),
       }),
     }),
     HttpModule.register({
@@ -41,10 +43,6 @@ import * as Joi from 'joi';
     }),
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    UrlDiscoveryService,
-    RegistrationService,
-  ],
+  providers: [AppService, UrlDiscoveryService, RegistrationService],
 })
 export class AppModule {}

@@ -16,4 +16,6 @@ export const configuration = () => ({
   hostname: os.hostname(),
   registrationUrl: process.env.REGISTRATION_URL,
   k_service: process.env.K_SERVICE,
+
+  openWeatherApiKey: process.env.OPENWEATHER_API_KEY,
 });

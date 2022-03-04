@@ -5,7 +5,7 @@ import {
   Req,
   Res,
   Body,
-  HttpService,
+  HttpService, Render, Param,
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Identity } from './interfaces/identity.interface';
@@ -18,6 +18,7 @@ import { ApiOperation, ApiParam, ApiPropertyOptional, ApiResponse } from '@nestj
 const ORG = 'org';
 const OBJECT = 'object';
 const OBJECT_ID = 'object_id';
+const ZIP = 'zip';
 
 @Controller()
 export class AppController {
@@ -87,7 +88,7 @@ export class AppController {
   @ApiResponse({ status: 200, description: 'Return JSON array containing a url' })
   getInfo(@Req() request: Request): Data {
     let orginalUrl = request.originalUrl;
-    orginalUrl = orginalUrl.replace('/info', '/transactions');
+    orginalUrl = orginalUrl.replace('/info', '/weather');
     const url = request.protocol + '://' + request.get('host') + orginalUrl;
     return {
       url: url,
@@ -131,12 +132,22 @@ export class AppController {
     // };
   }
 
-  @Get('transactions')
-  getTransactions(@Req() request: Request, @Res() response: Response) {
-    const object = request.query[OBJECT] as string;
-    const object_id = request.query[OBJECT_ID] as string;
-    response.set('Content-Type', 'text/html');
-    response.send(this.appService.getTransactions(object, object_id));
+  @Get('weather')
+  @Render('index')
+  async getWeather(@Req() request: Request, @Res() response: Response) {
+    const zip = request.query[ZIP] as string;
+
+    const result = await this.appService.getWeather(zip);
+
+    return result;
+  }
+
+  @Get('weather/zip/:zip')
+  @Render('index')
+  async getWeatherByZip(@Param('zip') zip: string) {
+
+    return await this.appService.getWeather(zip);
+
   }
 
   @Get('form')
@@ -158,6 +169,12 @@ export class AppController {
     //   response.set('Content-Type', 'application/json');
     //   response.send(data);
     // });
+  }
+
+  @Get('index')
+  @Render('index')
+  root() {
+    return { message: 'Hello world!' };
   }
 
   // metadata() {

@@ -1,17 +1,18 @@
-import { Injectable, OnApplicationBootstrap, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { Customer } from './interfaces/customer.interface';
+import { ConfigService } from '@nestjs/config';
 import { UrlDiscoveryService } from './services/url-discovery/url-discovery.service';
 import { RegistrationService } from './services/registration/registration.service';
 
 @Injectable()
 export class AppService implements OnApplicationBootstrap {
-
   private readonly logger = new Logger(AppService.name);
 
   private baseUrl: string;
   private customer: Customer;
 
   constructor(
+    private readonly config: ConfigService,
     private readonly urlDiscoveryService: UrlDiscoveryService,
     private readonly registrationService: RegistrationService,
   ) {}
@@ -30,7 +31,6 @@ export class AppService implements OnApplicationBootstrap {
       this.registrationService.setUrlToRegister(this.baseUrl);
       const response$ = await this.registrationService.register();
       response$.subscribe((response) => {
-
         this.logger.log('=== Connector Registration Response ===');
         this.logger.log(`statusCode: ${response.status}`);
         this.logger.log(response.data);
@@ -44,40 +44,27 @@ export class AppService implements OnApplicationBootstrap {
     this.customer = customer;
   }
 
-  getTransactions(
-    object: string | string[] | undefined,
-    object_id: string | string[] | undefined,
-  ): string {
+  async getWeather(zip: string | string[] | undefined): Promise<object> {
 
+    const apiKey = this.config.get('openWeatherApiKey');
 
-    // let html = '<h2>Last Three Transactions for ' + this.customer.id + ':</h2>';
-    let html = '';
-    if (object != undefined && object_id != undefined) {
-      html +=
-        '<h2>Last Three Transactions for ' +
-        object +
-        ' ' +
-        object_id +
-        ':</h2>';
-    } else {
-      html += '<h2>Last Three Transactions for:</h2>';
-    }
-    html += '<table style="width:100%">';
-    html += '<tr><th>Date</th><th>Description</th><th>Amount</th></tr>';
-    html +=
-      '<tr><th>' +
-      Date().toLocaleLowerCase('en-US') +
-      '</th><th>Nespresso</th><th>$25.88</th></tr>';
-    html +=
-      '<tr><th>' +
-      Date().toLocaleLowerCase('en-US') +
-      '</th><th>Ralphs</th><th>$101.22</th></tr>';
-    html +=
-      '<tr><th>' +
-      Date().toLocaleLowerCase('en-US') +
-      '</th><th>Best Buy</th><th>$722.22</th></tr>';
-    html += '</table>';
-    return html;
+    const endpoint = `https://api.openweathermap.org/data/2.5/weather?zip=${zip}&appid=${apiKey}`;
+
+    const fetch = require('node-fetch');
+
+    const result = await fetch(endpoint).then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      } else {
+        return response.json();
+      }
+    });
+
+    return {
+      zip: zip,
+      description: result.weather[0].description,
+    };
+
   }
 
   getForm(): string {
