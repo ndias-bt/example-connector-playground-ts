@@ -34,7 +34,7 @@ import * as Joi from 'joi';
         DESCRIPTION: Joi.string().default(''),
 
         REGISTRATION_URL: Joi.string().default(
-          'https://service-connector-registry-xzww6y6oeq-uc.a.run.app',
+          'https://service-connector-registry-xzww6y6oeq-uc.a.run.app/v1/connectors',
         ),
 
         OPENWEATHER_API_KEY: Joi.string(),
