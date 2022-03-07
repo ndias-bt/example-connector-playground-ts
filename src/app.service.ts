@@ -25,6 +25,7 @@ export class AppService implements OnApplicationBootstrap {
     return this.baseUrl;
   }
 
+
   async onApplicationBootstrap(): Promise<any> {
     try {
       this.setBaseUrl(await this.urlDiscoveryService.getConnectorUrl());

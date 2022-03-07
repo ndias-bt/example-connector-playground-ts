@@ -147,9 +147,9 @@ export class AppController {
   })
   getConfig() {
     return {
-      url: '/settings/view',
-      view: '/settings/view',
-      edit: '/settings/edit',
+      url: this.appService.getBaseUrl() + '/settings/view',
+      view: this.appService.getBaseUrl() + '/settings/view',
+      edit: this.appService.getBaseUrl() + '/settings/edit',
     };
   }
 
