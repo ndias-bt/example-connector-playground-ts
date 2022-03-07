@@ -5,15 +5,27 @@ import {
   Req,
   Res,
   Body,
-  HttpService, Render, Param,
+  HttpService,
+  Render,
+  Param,
+  UseInterceptors,
+  Logger,
+  Redirect,
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Identity } from './interfaces/identity.interface';
 import { ConfigService } from '@nestjs/config';
+import { SettingsService } from './services/settings/settings.service';
 import { Request, Response } from 'express';
 import { Data } from './interfaces/data.interface';
 import { map } from 'rxjs/operators';
-import { ApiOperation, ApiParam, ApiPropertyOptional, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiParam,
+  ApiPropertyOptional,
+  ApiResponse,
+} from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 const ORG = 'org';
 const OBJECT = 'object';
@@ -22,9 +34,12 @@ const ZIP = 'zip';
 
 @Controller()
 export class AppController {
+  logger = new Logger(AppController.name);
+
   constructor(
     private readonly appService: AppService,
     private config: ConfigService,
+    private settingsService: SettingsService,
   ) {}
 
   @ApiOperation({
@@ -85,7 +100,10 @@ export class AppController {
     description: 'The object id to retrieve information for',
     allowEmptyValue: true,
   })
-  @ApiResponse({ status: 200, description: 'Return JSON array containing a url' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return JSON array containing a url',
+  })
   getInfo(@Req() request: Request): Data {
     return {
       url: this.config.get('url') + '/weather',
@@ -123,23 +141,55 @@ export class AppController {
     description: 'The object id to retrieve information for',
     allowEmptyValue: true,
   })
-  @ApiResponse({ status: 200, description: 'Return JSON array containing a url' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return JSON array containing a url',
+  })
   getConfig() {
-    return {};
-    // return {
-    //   url:
-    //       'http://' +
-    //       this.configService.get<string>('ipAddress') +
-    //       ':' +
-    //       this.configService.get<string>('port') +
-    //       '/form',
-    // };
+    return {
+      url: '/settings/view',
+      view: '/settings/view',
+      edit: '/settings/edit',
+    };
   }
 
-  @Get('form')
-  getForm(@Res() response: Response) {
-    response.set('Content-Type', 'text/html');
-    response.send(this.appService.getForm());
+  @Get('settings/view')
+  @Render('settingsView')
+  async getSettingsView() {
+    const openweather_api_key = await this.settingsService
+      .findAll()
+      .then((settings) => settings[0].value);
+
+    this.logger.log('openweather api key:' + openweather_api_key);
+
+    return {
+      openweather_api_key: openweather_api_key,
+    };
+  }
+
+  @Get('settings/edit')
+  @Render('settingsEdit')
+  async getSettingsEditForm() {
+    const openweather_api_key = await this.settingsService
+      .findAll()
+      .then((settings) => settings[0].value);
+
+    return {
+      openweather_api_key: openweather_api_key,
+    };
+  }
+
+  @Post('settings/edit')
+  @Render('settingsView')
+  @UseInterceptors(FileInterceptor('file'))
+  processSettingsEditForm(@Body() formData) {
+    this.settingsService.create({
+      name: 'openweather_api_key',
+      value: formData.openweather_api_key,
+    });
+    return {
+      openweather_api_key: formData.openweather_api_key,
+    };
   }
 
   @Get('metadata')
